@@ -1,4 +1,4 @@
-name: Docker CI/CD with GCP
+name: GCP Final Deploy
 
 on:
   push:
@@ -10,17 +10,17 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout code
+      - name: Code
         uses: actions/checkout@v3
 
-      - name: Login to Docker Hub
-        run: echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
+      - name: Login to docker
+        run: echo "${{ secrets.DOCKER_PASSWORD}} | docker login -u ${{ secrets.DOCKER_USERNAME}} --password-stdin
 
-      - name: Build Docker image
-        run: docker build -t premchandpamidi/test:v1 .
+      - name: Build Docker Image
+        run: docker build -t premchandpamidi/test:latest .
 
-      - name: Push Docker image
-        run: docker push premchandpamidi/test:v1
+      - name: Pushing into docker hub
+        run: docker push premchandpamidi/test:latest
 
       - name: Deploy to GCP
         uses: appleboy/ssh-action@v1.0.3
@@ -29,6 +29,6 @@ jobs:
           username: ${{secrets.GCP_USER}}
           key: ${{secrets.GCP_KEY}}
           script: |
-            docker pull premchandpamidi/test:v1
-            doccker rm -f test || true
-            docker run -d --name test -p 8095:80 premchandpamidi/test:v1
+            docker pull premchandpamidi/test:latest
+            docker rm -f test-app || true
+            docker run -d --name test-app -p 8095:80 premchandpamidi/test:latest
